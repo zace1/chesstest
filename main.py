@@ -14,14 +14,15 @@ fps = 15
 images = {}
 
 
-def loadImages():
+def load_images():
     pieces = ['wp', 'wB', 'wK', 'wN', 'wQ', 'wR',
               'bp', 'bB', 'bK', 'bN', 'bQ', 'bR']
     for piece in pieces:
-        images[piece] = p.transform.scale(p.image.load("piece_images_1/" + piece + ".png"), (PieceDimensions, PieceDimensions))
+        images[piece] = p.transform.scale(p.image.load("piece_images_1/" + piece + ".png"),
+                                          (PieceDimensions, PieceDimensions))
 
 
-def drawBoard(screen):
+def draw_board(screen):
     for i in range(NumOfRowsAndColumns):
         for j in range(NumOfRowsAndColumns):
             if i % 2 == 0:
@@ -37,7 +38,7 @@ def drawBoard(screen):
             p.draw.rect(screen, color, p.Rect(i*SizeOfSquare, j*SizeOfSquare, SizeOfSquare, SizeOfSquare))
 
 
-def drawPieces(screen, board):
+def draw_pieces(screen, board):
     for i in range(NumOfRowsAndColumns):
         for j in range(NumOfRowsAndColumns):
             piece = board[j][i]
@@ -50,24 +51,44 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = GameState()
-    loadImages()
+    load_images()
     running = True
+    initial_square = ()
+    player_clicks = []       # contains two tuples in a list
     while running:
         for i in p.event.get():
             if i.type == p.QUIT:
                 running = False
-        drawGameStates(screen, gs)
+            elif i.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()
+                row = location[1] // SizeOfSquare
+                col = location[0] // SizeOfSquare         # location[0] = x location[1] = y
+                if initial_square == (row, col):
+                    initial_square = ()
+                    player_clicks = []
+                else:
+                    initial_square = (row, col)
+                    player_clicks.append(initial_square)
+                if len(player_clicks) == 2:
+                    move = Move(player_clicks[0], player_clicks[1], gs.board)
+                    piece_moved = gs.board[player_clicks[0][0]][player_clicks[0][1]]
+                    if gs.board[player_clicks[1][0]][player_clicks[1][1]] != '00':
+                        capture = True
+                    else:
+                        capture = False
+                    print(move.get_notation(piece_moved, capture))
+                    gs.make_move(move)
+                    initial_square = ()
+                    player_clicks = []
+        draw_game_states(screen, gs)
         clock.tick(fps)
         p.display.flip()
 
 
-def drawGameStates(screen, gs):
-    drawBoard(screen)
-    drawPieces(screen, gs.board)
+def draw_game_states(screen, gs):
+    draw_board(screen)
+    draw_pieces(screen, gs.board)
 
 
 if __name__ == "__main__":
     main()
-
-
-
