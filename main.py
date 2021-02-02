@@ -1,5 +1,4 @@
 # main stores all info about current state
-
 import pygame as p
 from engine1 import *
 
@@ -66,20 +65,30 @@ def main():
                 if initial_square == (row, col):
                     initial_square = ()
                     player_clicks = []
+                    possible_moves = []
                 else:
                     initial_square = (row, col)
                     player_clicks.append(initial_square)
-                if len(player_clicks) == 2:
-                    move = Move(player_clicks[0], player_clicks[1], gs.board)
                     piece_moved = gs.board[player_clicks[0][0]][player_clicks[0][1]]
-                    if gs.board[player_clicks[1][0]][player_clicks[1][1]] != '00':
-                        capture = True
+                    first_click = Move(player_clicks[0], False, piece_moved, gs.board)      # horrible solution to allow access to check_for_legality()
+                    if len(player_clicks) == 1:
+                        possible_moves = first_click.get_all_possible_moves(piece_moved, gs.board)
+                        print(possible_moves)
+                if len(player_clicks) == 2:
+                    piece_moved = gs.board[player_clicks[0][0]][player_clicks[0][1]]
+                    if piece_moved != '00':
+                        move = Move(player_clicks[0], player_clicks[1], piece_moved, gs.board)
+                        if gs.board[player_clicks[1][0]][player_clicks[1][1]] != '00':
+                            capture = True
+                        else:
+                            capture = False
+                        print(move.get_notation(piece_moved, capture))
+                        gs.make_move(move, piece_moved)
+                        initial_square = ()
+                        player_clicks = []
                     else:
-                        capture = False
-                    print(move.get_notation(piece_moved, capture))
-                    gs.make_move(move)
-                    initial_square = ()
-                    player_clicks = []
+                        initial_square = ()
+                        player_clicks = []
         draw_game_states(screen, gs)
         clock.tick(fps)
         p.display.flip()
