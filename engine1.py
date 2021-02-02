@@ -71,26 +71,26 @@ class Move:
         possible_moves = []
         if piece_moved == 'wp':
             if board[self.startRow-1][self.startCol] == '00':
-                possible_moves.append((self.startRow-1, self.startCol ))
+                possible_moves.append((self.startRow - 1, self.startCol))
                 if self.startRow == 6:
                     possible_moves.append((4, self.startCol))
             if self.startRow != 0:
-                if board[self.startRow-1][self.startCol+1] != '00':
-                    possible_moves.append((self.startRow-1, self.startCol+1))
+                if board[self.startRow - 1][self.startCol + 1] != '00':
+                    possible_moves.append((self.startRow - 1, self.startCol+1))
             if self.startRow != 7:
-                if board[self.startRow-1][self.startCol-1] != '00':
-                    possible_moves.append((self.startRow-1, self.startCol-1))
+                if board[self.startRow - 1][self.startCol - 1] != '00':
+                    possible_moves.append((self.startRow - 1, self.startCol - 1))
         if piece_moved == 'bp':
             if board[self.startRow+1][self.startCol] == '00':
-                possible_moves.append((self.startRow+1, self.startCol ))
+                possible_moves.append((self.startRow + 1, self.startCol))
                 if self.startRow == 1:
                     possible_moves.append((3, self.startCol))
             if self.startRow != 0:
-                if board[self.startRow+1][self.startCol+1] != '00':
+                if board[self.startRow + 1][self.startCol + 1] != '00':
                     possible_moves.append((self.startRow+1, self.startCol+1))
             if self.startRow != 7:
-                if board[self.startRow+1][self.startCol-1] != '00':
-                    possible_moves.append((self.startRow+1, self.startCol-1))
+                if board[self.startRow + 1][self.startCol - 1] != '00':
+                    possible_moves.append((self.startRow + 1, self.startCol - 1))
         if piece_moved == 'wN' or piece_moved == 'bN':
             if piece_moved == 'wN':
                 side = 'w'

@@ -1,5 +1,4 @@
 # main stores all info about current state
-
 import pygame as p
 from engine1 import *
 
