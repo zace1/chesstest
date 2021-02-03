@@ -46,6 +46,7 @@ def draw_pieces(screen, board):
 
 
 def main():
+    movelist = []
     screen = p.display.set_mode((Width, Height))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
@@ -70,13 +71,24 @@ def main():
                     initial_square = (row, col)
                     player_clicks.append(initial_square)
                     piece_moved = gs.board[player_clicks[0][0]][player_clicks[0][1]]
-                    first_click = Move(player_clicks[0], False, piece_moved, gs.board)      # horrible solution to allow access to check_for_legality()
-                    if len(player_clicks) == 1:
-                        possible_moves = first_click.get_all_possible_moves(player_clicks[0], piece_moved, gs.board)
-                        possible_moves_visual = possible_moves[0]
-                        moves_raw = possible_moves[1]
-                        print('legal moves:\n')
-                        print(possible_moves_visual)
+                    if gs.whiteToPlay is True:
+                        side = 'w'
+                    else:
+                        side = 'b'
+                    if piece_moved.startswith(side):
+                        first_click = Move(player_clicks[0], False, piece_moved,
+                                           gs.board)  # horrible solution to allow access to check_for_legality()
+                        if len(player_clicks) == 1:
+                            possible_moves = first_click.get_all_possible_moves(player_clicks[0], gs.board,
+                                                                                gs.whiteToPlay)
+                            if possible_moves is not False:
+                                possible_moves_visual = possible_moves[0]
+                                moves_raw = possible_moves[1]
+                                # print('legal moves:\n')
+                                print(possible_moves_visual)
+                    else:
+                        initial_square = ()
+                        player_clicks = []
                 if len(player_clicks) == 2:
                     piece_moved = gs.board[player_clicks[0][0]][player_clicks[0][1]]
                     if piece_moved != '00':
@@ -85,13 +97,15 @@ def main():
                             capture = True
                         else:
                             capture = False
-                        notated_move = move.get_notation(capture, gs.board)
                         if (move.endRow, move.endCol) in moves_raw:
                             gs.make_move(move, piece_moved)
-                            print('move played:\n')
-                            print(notated_move)
+                            # print('move played:\n')
+                            notated_move = move.get_notation(capture, gs.board, gs.whiteToPlay)
+                            movelist.append(notated_move)
+                            print(movelist)
                         else:
-                            print('not legal\n')
+                            pass
+                            # print('not legal\n')
                         moves_raw = []
                         initial_square = ()
                         player_clicks = []
@@ -103,7 +117,7 @@ def main():
             for squares in moves_raw:
                 p.draw.circle(screen, (0, 135, 0),
                               (((Width / NumOfRowsAndColumns) * int(squares[1]) + ((Width / NumOfRowsAndColumns) / 2)),
-                                ((Width / NumOfRowsAndColumns) * int(squares[0]) + ((Width / NumOfRowsAndColumns) / 2))), 5)
+                               ((Width / NumOfRowsAndColumns) * int(squares[0]) + ((Width / NumOfRowsAndColumns) / 2))), 5)
         clock.tick(fps)
         p.display.flip()
 
