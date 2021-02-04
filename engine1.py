@@ -1,5 +1,6 @@
 from main import *
 
+
 class GameState():
     def __init__(self):
         # "00" empty space
@@ -44,7 +45,6 @@ class Move:
         self.piece_type = piece_type
 
     def check_for_other_of_same_piece(self, capture, board, white_to_play, endswith):
-        other_piece_moves = []
         initial = endswith
         specify = 0
         for i in range(NumOfRowsAndColumns):
@@ -170,92 +170,38 @@ class Move:
                         if self.startCol < 7 and self.same_side(2, 1, side, board) is False:
                             possible_moves.append((self.startRow + 2, self.startCol + 1))
             if self.pieceMoved == 'wB' or self.pieceMoved == 'bB' or self.pieceMoved == 'wQ' or self.pieceMoved == 'bQ':      # bishop
-                num_moves = 1
-                temp_count = (min(self.startRow, self.startCol))     # up left
-                while num_moves <= temp_count >= 0:
-                    if board[self.startRow-num_moves][self.startCol-num_moves] == '00':
-                        possible_moves.append((self.startRow-num_moves, self.startCol-num_moves))
-                        num_moves += 1
-                    elif self.same_side(-num_moves, -num_moves, side, board) is True:
-                        temp_count = 0
-                    else:
-                        possible_moves.append((self.startRow-num_moves, self.startCol-num_moves))
-                        temp_count = 0
-                temp_count = (min(self.startRow, 7-self.startCol))      # up right
-                num_moves = 1
-                while num_moves <= temp_count >= 0:
-                    if board[self.startRow-num_moves][self.startCol+num_moves] == '00':
-                        possible_moves.append((self.startRow-num_moves, self.startCol+num_moves))
-                        num_moves += 1
-                    elif self.same_side(-num_moves, num_moves, side, board) is True:
-                        temp_count = 0
-                    else:
-                        possible_moves.append((self.startRow-num_moves, self.startCol+num_moves))
-                        temp_count = 0
-                temp_count = (min(7-self.startRow, self.startCol))      # down left
-                num_moves = 1
-                while num_moves <= temp_count >= 0:
-                    if board[self.startRow+num_moves][self.startCol-num_moves] == '00':
-                        possible_moves.append((self.startRow+num_moves, self.startCol-num_moves))
-                        num_moves += 1
-                    elif self.same_side(num_moves, -num_moves, side, board) is True:
-                        temp_count = 0
-                    else:
-                        possible_moves.append((self.startRow+num_moves, self.startCol-num_moves))
-                        temp_count = 0
-                temp_count = (min(7-self.startRow, 7-self.startCol))
-                num_moves = 1
-                while num_moves <= temp_count >= 0:
-                    if board[self.startRow+num_moves][self.startCol+num_moves] == '00':
-                        possible_moves.append((self.startRow+num_moves, self.startCol+num_moves))
-                        num_moves += 1
-                    elif self.same_side(num_moves, num_moves, side, board) is True:
-                        temp_count = 0
-                    else:
-                        possible_moves.append((self.startRow+num_moves, self.startCol+num_moves))
-                        temp_count = 0
+                loops = 0
+                count_list = [min(self.startRow, self.startCol), min(self.startRow, 7-self.startCol),
+                              min(7-self.startRow, self.startCol), min(7-self.startRow, 7-self.startCol)]
+                while loops < 4:
+                    if count_list[loops] > 0:
+                        for i in range(1, count_list[loops]+1):
+                            direction_tracker = {0: (-i, -i), 1: (-i, i), 2: (i, -i), 3: (i, i)}
+                            if board[self.startRow + direction_tracker[loops][0]][self.startCol + direction_tracker[loops][1]] == '00':
+                                possible_moves.append((self.startRow + direction_tracker[loops][0], self.startCol + direction_tracker[loops][1]))
+                            elif self.same_side(direction_tracker[loops][0], direction_tracker[loops][1], side, board) is True:
+                                break
+                            else:
+                                possible_moves.append((self.startRow + direction_tracker[loops][0], self.startCol + direction_tracker[loops][1]))
+                                break
+                    loops += 1
             if self.pieceMoved == 'wR' or self.pieceMoved == 'bR' or self.pieceMoved == 'wQ' or self.pieceMoved == 'bQ':
+                loops = 0
                 x = self.startCol
                 y = self.startRow
-                for i in range(1, y+1):          # up
-                    if board[self.startRow-i][self.startCol] == '00':
-                        possible_moves.append((self.startRow-i, self.startCol))
-                    elif self.same_side(-i, 0, side, board) is True:
-                        break
-                    else:
-                        possible_moves.append((self.startRow - i, self.startCol))
-                        break
-                for i in range(1, 7-(y-1)):     # down
-                    if board[self.startRow + i][self.startCol] == '00':
-                        possible_moves.append((self.startRow + i, self.startCol))
-                    elif self.same_side(i, 0, side, board) is True:
-                        print(i)
-                        break
-                    else:
-                        possible_moves.append((self.startRow + i, self.startCol))
-                        print(i)
-                        break
-                for i in range(1, x+1):     # left
-                    if board[self.startRow][self.startCol-i] == '00':
-                        possible_moves.append((self.startRow, self.startCol-i))
-                    elif self.same_side(0, -i, side, board) is True:
-                        print(i)
-                        break
-                    else:
-                        possible_moves.append((self.startRow, self.startCol-i))
-                        print(i)
-                        break
-                for i in range(1, 7-(x-1)):     # right
-                    if board[self.startRow][self.startCol + i] == '00':
-                        possible_moves.append((self.startRow, self.startCol + i))
-                    elif self.same_side(0, i, side, board) is True:
-                        print(i)
-                        break
-                    else:
-                        possible_moves.append((self.startRow, self.startCol + i))
-                        print(i)
-                        break                                   # can be simplified, written as one function?
-
+                xy_list = [(1, y + 1), (1, 7 - (y - 1)), (1, x + 1), (1, 7 - (x - 1))]
+                while loops < 4:
+                    for i in range(xy_list[loops][0], xy_list[loops][1]):          # up
+                        move_dict = {0: (-i, 0), 1: (i, 0), 2:  (0, -i), 3: (0, i)}
+                        print(board[self.startRow + move_dict[loops][0]][self.startCol + move_dict[loops][1]])
+                        if board[self.startRow + move_dict[loops][0]][self.startCol + move_dict[loops][1]] == '00':
+                            possible_moves.append((self.startRow + move_dict[loops][0], self.startCol + move_dict[loops][1]))
+                        elif self.same_side(move_dict[loops][0], move_dict[loops][1], side, board) is True:
+                            break
+                        else:
+                            possible_moves.append((self.startRow + move_dict[loops][0], self.startCol + move_dict[loops][1]))
+                            break
+                    loops += 1
             moves_raw = list(possible_moves)
             for i in range(len(possible_moves)):
                 if board[possible_moves[i][0]][possible_moves[i][1]] != '00':
