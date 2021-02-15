@@ -17,10 +17,19 @@ class GameState():
         self.whiteToPlay = True
         self.moveLog = []
         self.AbleToCastle = True
+        self.check = False
 
     def make_move(self, move, piece_moved):
         self.board[move.startRow][move.startCol] = "00"
         self.board[move.endRow][move.endCol] = piece_moved
+        next_move = Move((move.endRow, move.endCol), False, piece_moved, self.board)
+        move_list = next_move.get_all_possible_moves((move.endRow, move.endCol), self.board, self.whiteToPlay)
+        move_list_raw = move_list[1]
+        move_list_notated = move_list[0]
+        for i in range(len(move_list_notated)):
+            if 'x' in move_list_notated[i]:
+                if self.board[move_list_raw[i][0]][move_list_raw[i][1]].endswith('K'):
+                    self.check = True
         self.moveLog.append(move)
         self.whiteToPlay = not self.whiteToPlay
 
@@ -123,7 +132,7 @@ class Move:
             side = 'w'
         else:
             side = 'b'
-        if (side == 'w' and white_to_play is True) or (side == 'b' and white_to_play is False):  # parentheses for visualization
+        if (side == 'w' and white_to_play is True) or (side == 'b' and white_to_play is False):
             possible_moves = []
             possible_captures = []
             if self.pieceMoved == 'wp':     # white pawn
@@ -193,7 +202,6 @@ class Move:
                 while loops < 4:
                     for i in range(xy_list[loops][0], xy_list[loops][1]):          # up
                         move_dict = {0: (-i, 0), 1: (i, 0), 2:  (0, -i), 3: (0, i)}
-                        print(board[self.startRow + move_dict[loops][0]][self.startCol + move_dict[loops][1]])
                         if board[self.startRow + move_dict[loops][0]][self.startCol + move_dict[loops][1]] == '00':
                             possible_moves.append((self.startRow + move_dict[loops][0], self.startCol + move_dict[loops][1]))
                         elif self.same_side(move_dict[loops][0], move_dict[loops][1], side, board) is True:
@@ -210,4 +218,3 @@ class Move:
                 return moves_raw
             return [self.check_for_legality_with_capture_list(moves_raw, self.pieceMoved, possible_captures, start, board, white_to_play), moves_raw]
         return False
-

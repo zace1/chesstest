@@ -98,8 +98,8 @@ def main():
                         else:
                             capture = False
                         if (move.endRow, move.endCol) in moves_raw:
-                            gs.make_move(move, piece_moved)
                             # print('move played:\n')
+                            gs.make_move(move, piece_moved)
                             notated_move = move.get_notation(capture, gs.board, gs.whiteToPlay)
                             movelist.append(notated_move)
                             print(movelist)
